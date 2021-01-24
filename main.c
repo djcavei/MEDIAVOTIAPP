@@ -45,10 +45,10 @@ int media_print(voti_t *v, const *votame, const *cfu, int size) {
 void print(voti_t *v) {
     int i , tot_crediti = 0, somma_parziale = 0;
     float voto_laurea, media;
-    printf("INSEGNAMENTO                               VOTO  CFU   \n");
+    printf("INSEGNAMENTO                                 VOTO  CFU   \n");
     for (i = 0; i < v->size; i++) {
-        printf("+---------------------------------------------------+\n");
-        printf("| %s ", v->corso[i].nome);
+        printf("+-----------------------------------------------------+\n");
+        printf("|%d. %s ", i+1, v->corso[i].nome);
         printf("| %d |", v->voto[i]);
         if (v->cfu[i] < 10) {
             printf("  %d |", v->cfu[i]);
@@ -58,7 +58,7 @@ void print(voti_t *v) {
         printf("\n");
         tot_crediti += v->cfu[i];
     }
-    printf("+---------------------------------------------------+\n");
+    printf("+-----------------------------------------------------+\n");
     printf("\n\n");
     somma_parziale = media_print(v, v->voto, v->cfu, v->size);
 /*
@@ -124,7 +124,6 @@ void add(voti_t *v) {
                 }
             }
         }
-
         v->corso[v->size - 1].nome[39] = '\0';
         printf("inserisci voto: ");
         scanf("%d", &vote);

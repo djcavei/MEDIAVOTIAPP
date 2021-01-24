@@ -77,17 +77,23 @@ void print(voti_t *v) {
 
 void delete(voti_t *v) {
     if (v->size > 0) {
+        corso_t temp[v->size - 1];
         int arr[v->size-1];
         int c_arr[v->size-1];
-        int n, i, count = 0;
+        int n, i, j, count = 0;
         printf("Cosa vuoi cancellare?");
         scanf("%d", &n);
+        printf("\n");
         v->voto[n-1] = 0;
         v->cfu[n-1] = 0;
+        v->corso[n-1].nome[0] = '{';
         for (i = 0; i < v->size; i++) {
-            if (v->voto[i] != 0) {
+            if (v->voto[i] != 0 && v->corso[i].nome[0] != '{') {
                 arr[i-count] = v->voto[i];
                 c_arr[i-count] = v->cfu[i];
+                for (j = 0; j < 40; j++) {
+                    temp[i - count].nome[j] = v->corso[i].nome[j];
+                }
             } else {
                 count++;
             }
@@ -95,9 +101,13 @@ void delete(voti_t *v) {
         v->size -= 1;
         v->voto = (int*)malloc(v->size*sizeof (int));
         v->cfu = (int*)malloc(v->size*sizeof (int));
+        v->corso = (corso_t*)malloc(v->size* sizeof(corso_t));
         for (i = 0; i < v->size; i++) {
             v->voto[i] = arr[i];
             v->cfu[i] = c_arr[i];
+            for (j = 0; j < 40; j++) {
+                v->corso[i].nome[j] = temp[i].nome[j];
+            }
         }
         print(v);
     }

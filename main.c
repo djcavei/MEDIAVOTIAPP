@@ -70,7 +70,7 @@ void print(voti_t *v) {
         printf("La media ponderata e': %.2f\n", media);
         voto_laurea = (media * 110) / 30;
         printf("Il voto di partenza e': %.0f/110\n\n", voto_laurea);
-        printf("Ti mancano %d alla laurea!\n", 180-tot_crediti);
+        printf("Ti mancano %d crediti alla laurea!\n", 180-tot_crediti);
         /*printf("Per il tuo target %d dovresti avere la media del %d\n", v->target, (v->target * 30)/110);*/
     }
 }
@@ -150,14 +150,39 @@ void add(voti_t *v) {
 }
 
 int main() {
-    setbuf(stdout, 0);
-    printf("CALCOLA LA TUA MEDIA VOTI UNIVERSITARIA!\n");
+    FILE *votes_f;
+    FILE *sizes_f;
+    FILE *cfus_f;
+    FILE *courses_f;
     voti_t *voto = NULL;
+    int i, j;
     int exitt = 0;
     char operation = 'x';
     voto = create(voto);
+    votes_f = fopen("voti.txt", "r+");
+    if (votes_f) {
+        printf("prova entrata\n");
+        sizes_f = fopen("size.txt", "r+");
+        cfus_f = fopen("cfus.txt", "r+");
+        courses_f = fopen("courses.txt", "r+");
+        fscanf(sizes_f, "%d", &voto->size);
+        voto->voto = (int*)malloc(voto->size * sizeof(int));
+        voto->cfu = (int*)malloc(voto->size * sizeof(int));
+        voto->corso = (corso_t*)malloc(voto->size * sizeof(corso_t));
+        for (i = 0; i < voto->size; i++) {
+            fscanf(votes_f, "%d ", &voto->voto[i]);
+            fscanf(cfus_f, "%d ", &voto->cfu[i]);
+            fgets(voto->corso[i].nome,40, courses_f);
+        }
+        fclose(courses_f);
+        fclose(sizes_f);
+        fclose(cfus_f);
+        fclose(votes_f);
+    }
     /*printf("inserisci il tuo obiettivo in centodecimi: \n");
     scanf("%d", &voto->target);*/
+    setbuf(stdout, 0);
+    printf("CALCOLA LA TUA MEDIA VOTI UNIVERSITARIA!\n");
     while(!exitt) {
         printf("cosa vuoi fare? (a)dd, (d)el, (p)rint, (s)ave and quit?: ");
         scanf(" %c", &operation);
@@ -180,5 +205,19 @@ int main() {
             }
         }
     }
+    votes_f = fopen("voti.txt", "w");
+    sizes_f = fopen("size.txt", "w");
+    cfus_f = fopen("cfus.txt", "w");
+    courses_f = fopen("courses.txt", "w");
+    for (i = 0; i < voto->size; i++) {
+        fprintf(votes_f, "%d ", voto->voto[i]);
+        fprintf(cfus_f, "%d ", voto->cfu[i]);
+        fprintf(courses_f, "%s", voto->corso[i].nome);
+    }
+    fprintf(sizes_f, "%d", voto->size);
+    fclose(votes_f);
+    fclose(cfus_f);
+    fclose(sizes_f);
+    fclose(courses_f);
     exit(EXIT_SUCCESS);
 }

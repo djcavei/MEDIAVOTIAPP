@@ -43,7 +43,7 @@ int media_print(voti_t *v, const *votame, const *cfu, int size) {
 }
 
 void print(voti_t *v) {
-    int i , tot_crediti = 0, somma_parziale = 0;
+    int i , tot_crediti = 0, somma_parziale;
     float voto_laurea, media;
     printf("INSEGNAMENTO                                 VOTO  CFU   \n");
     for (i = 0; i < v->size; i++) {
@@ -77,9 +77,9 @@ void print(voti_t *v) {
 
 void delete(voti_t *v) {
     if (v->size > 0) {
-        corso_t temp[v->size - 1];
-        int arr[v->size-1];
-        int c_arr[v->size-1];
+        corso_t *temp = malloc((v->size - 1) * sizeof(corso_t));
+        int *arr = malloc((v->size - 1) * sizeof(int));
+        int *c_arr = malloc((v->size - 1) * sizeof(int));
         int n, i, j, count = 0;
         printf("Cosa vuoi cancellare?");
         scanf("%d", &n);
@@ -109,6 +109,9 @@ void delete(voti_t *v) {
                 v->corso[i].nome[j] = temp[i].nome[j];
             }
         }
+        free(temp);
+        free(arr);
+        free(c_arr);
         print(v);
     }
 }
@@ -116,36 +119,30 @@ void delete(voti_t *v) {
 void add(voti_t *v) {
     int vote = 0;
     int cfu = 0;
-    int n = 0;
     int i;
-    printf("Quanti voti vuoi inserire consecutivamente? ");
-    scanf("%d", &n);
     printf("\n");
-    while (n>0) {
-        getchar();
-        printf("inserisci nome insegnamento: ");
-        v->size += 1;
-        v->corso = realloc(v->corso, v->size * sizeof(corso_t));
-        fgets(&v->corso[v->size - 1].nome[0], 40, stdin);
-        for (i = 0; i < 40; i++) {
-            if (v->corso[v->size - 1].nome[i] == '\n') {
-                for (i = i; i < 40; i++) {
-                    v->corso[v->size - 1].nome[i] = ' ';
-                }
+    getchar();
+    printf("inserisci nome insegnamento: ");
+    v->size += 1;
+    v->corso = realloc(v->corso, v->size * sizeof(corso_t));
+    fgets(&v->corso[v->size - 1].nome[0], 40, stdin);
+    for (i = 0; i < 40; i++) {
+        if (v->corso[v->size - 1].nome[i] == '\n') {
+            for (i = i; i < 40; i++) {
+                v->corso[v->size - 1].nome[i] = ' ';
             }
         }
-        v->corso[v->size - 1].nome[39] = '\0';
-        printf("inserisci voto: ");
-        scanf("%d", &vote);
-        printf("inserisci crediti: ");
-        scanf("%d", &cfu);
-        printf("\n");
-        v->voto = realloc(v->voto, v->size * sizeof(int));
-        v->cfu = realloc(v->cfu, v->size * sizeof(int));
-        v->voto[v->size - 1] = vote;
-        v->cfu[v->size - 1] = cfu;
-        n--;
     }
+    v->corso[v->size - 1].nome[39] = '\0';
+    printf("inserisci voto: ");
+    scanf("%d", &vote);
+    printf("inserisci crediti: ");
+    scanf("%d", &cfu);
+    printf("\n");
+    v->voto = realloc(v->voto, v->size * sizeof(int));
+    v->cfu = realloc(v->cfu, v->size * sizeof(int));
+    v->voto[v->size - 1] = vote;
+    v->cfu[v->size - 1] = cfu;
     print(v);
 }
 

@@ -23,12 +23,17 @@ voti_t *create (voti_t *v) {
     return v;
 }
 
+/*check_scanf(int x);*/
+
 int check_op(char operation) {
     if (operation == 'a' || operation == 'A') return 1;
     else if (operation == 'p' || operation == 'P') return 2;
     else if (operation == 'd' || operation == 'D') return 3;
     else if (operation == 's' || operation == 'S') return 4;
-    else return 0;
+    else {
+        printf("\n");
+        return 0;
+    }
 }
 
 int media_print(voti_t *v, const *votame, const *cfu, int size) {
@@ -48,7 +53,9 @@ void print(voti_t *v) {
     printf("INSEGNAMENTO                                 VOTO  CFU   \n");
     for (i = 0; i < v->size; i++) {
         printf("+-----------------------------------------------------+\n");
-        printf("|%d. %s ", i+1, v->corso[i].nome);
+        if (i < 9) {
+            printf("|%d. %s ", i+1, v->corso[i].nome);
+        } else printf("|%d.%s ", i+1, v->corso[i].nome);
         printf("| %d |", v->voto[i]);
         if (v->cfu[i] < 10) {
             printf("  %d |", v->cfu[i]);
@@ -75,18 +82,46 @@ void print(voti_t *v) {
     }
 }
 
+int check_delete(voti_t *v, long n) {
+    if (n <= 0 || n > v->size) {
+        return 0;
+    }
+    return 1;
+}
+
+/*int string_convert(voti_t *v, long x) {
+        if (x <= 0 || x > v->size) {
+            return 0;
+        } else return x;
+}*/
+
 void delete(voti_t *v) {
     if (v->size > 0) {
         corso_t *temp = malloc((v->size - 1) * sizeof(corso_t));
         int *arr = malloc((v->size - 1) * sizeof(int));
         int *c_arr = malloc((v->size - 1) * sizeof(int));
-        int n, i, j, count = 0;
+        int i, j, count = 0;
+        long int w;
+        char x[100];
+        char *ptr;
         printf("Cosa vuoi cancellare?");
-        scanf("%d", &n);
+        /*scanf("%s", x);
+        x[3] = '\0';*/
+        getchar();
+        fgets(x, 4, stdin);
+        w = strtol(x, &ptr, 10);
+        /*y[0] = x[0];*/
+        /*n = string_convert(v, w);*/
+        if (!check_delete(v, w)) {
+            free(temp);
+            free(arr);
+            free (c_arr);
+            return;
+        }
         printf("\n");
-        v->voto[n-1] = 0;
-        v->cfu[n-1] = 0;
-        v->corso[n-1].nome[0] = '{';
+        v->voto[w-1] = 0;
+        v->cfu[w-1] = 0;
+        v->corso[w-1].nome[0] = '{';
         for (i = 0; i < v->size; i++) {
             if (v->voto[i] != 0 && v->corso[i].nome[0] != '{') {
                 arr[i-count] = v->voto[i];
@@ -98,6 +133,9 @@ void delete(voti_t *v) {
                 count++;
             }
         }
+        free(v->voto);
+        free(v->cfu);
+        free(v->corso);
         v->size -= 1;
         v->voto = (int*)malloc(v->size*sizeof (int));
         v->cfu = (int*)malloc(v->size*sizeof (int));
@@ -136,8 +174,10 @@ void add(voti_t *v) {
     v->corso[v->size - 1].nome[39] = '\0';
     printf("inserisci voto: ");
     scanf("%d", &vote);
+    getchar();
     printf("inserisci crediti: ");
     scanf("%d", &cfu);
+    getchar();
     printf("\n");
     v->voto = realloc(v->voto, v->size * sizeof(int));
     v->cfu = realloc(v->cfu, v->size * sizeof(int));
@@ -146,17 +186,29 @@ void add(voti_t *v) {
     print(v);
 }
 
+/*int check_fgets(char s) {
+    if (s != '\n') return 0;
+    else return 1;
+}
+
+int check_scanf(int x) {
+
+}*/
+
 int main() {
     FILE *votes_f;
     FILE *sizes_f;
     FILE *cfus_f;
     FILE *courses_f;
     voti_t *voto = NULL;
-    int i, j;
+    int i;
     int exitt = 0;
-    char operation = 'x';
+    char operation[100];
+    char op_1[1];
     voto = create(voto);
     votes_f = fopen("voti.txt", "r+");
+    /*operation[0] = 'x';*/
+    printf("CALCOLA LA TUA MEDIA VOTI UNIVERSITARIA!\n");
     if (votes_f) {
         printf("prova entrata\n");
         sizes_f = fopen("size.txt", "r+");
@@ -175,15 +227,19 @@ int main() {
         fclose(sizes_f);
         fclose(cfus_f);
         fclose(votes_f);
+        print(voto);
     }
     /*printf("inserisci il tuo obiettivo in centodecimi: \n");
     scanf("%d", &voto->target);*/
     setbuf(stdout, 0);
-    printf("CALCOLA LA TUA MEDIA VOTI UNIVERSITARIA!\n");
     while(!exitt) {
         printf("cosa vuoi fare? (a)dd, (d)el, (p)rint, (s)ave and quit?: ");
-        scanf(" %c", &operation);
-        switch (check_op(operation)) {
+        /*fgets(operation, 100, stdin);*/
+        scanf("%s", operation);
+        op_1[0] = operation[0];
+        /*operation[1] = '\000';*/
+        /*operation[1] = '\0';*/
+        switch (check_op(op_1[0])) {
             case 1: {
                 add(voto);
                 continue;
@@ -199,6 +255,10 @@ int main() {
             case 4: {
                 exitt = 1;
                 continue;
+            }
+            case 0: {
+                exitt = 0;
+                break;
             }
         }
     }
